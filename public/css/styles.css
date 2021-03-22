@@ -1,0 +1,69 @@
+body {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  background-color: gray;
+}
+
+.chat-container {
+  /* max-width: 600px; */
+  padding: 10px;
+  background-color: white;
+  /* background: rgba(19, 35, 47, 0.9); */
+}
+
+.messages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  overflow-y: scroll;
+  height: 200px;
+}
+
+.msgField {
+  margin-top: 5px;
+  padding: 2px;
+}
+.chatBox {
+  width: 500px;
+  /* margin-right: 500px; */
+  position: fixed;
+  right: 10cm;
+  border: 3px solid;
+  box-shadow: 10px 10px 10px 10px rgba(19, 35, 47, 0.3);
+  border-radius: 4px;
+  /* max-width: 600px; */
+  /* border: 3px solid;
+  float: right;
+  background: rgba(19, 35, 47, 0.9);
+  padding: 10px;
+  max-width: 600px;
+  margin: 40px auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
+  margin-right: 20px; what ever you want */
+}
+
+.buttons-container {
+  background: rgb(0, 0, 0);
+}
+
+.usersDiv {
+  padding: 3px;
+  /* padding-bottom: 15px; */
+  border: solid rgb(0, 174, 255) 3px;
+  border-radius: 10px;
+  background-color: gray;
+  width: 250px;
+}
+
+.usersDivHeader {
+  padding: 5px;
+  font-weight: bold;
+}
+
+.username {
+  padding: 5px;
+  font: italic;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  margin: auto;
+}
