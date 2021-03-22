@@ -1,3 +1,5 @@
+APP IS NOW DEPLOYED TO THE WEB: https://kvaara-chatter-app.herokuapp.com/
+
 1. Install NodeJS and MongoDB community server.
 
 2. Open up the terminal and in the terminal head over to the 'Harjoitus5' directory and install dependenices by typing in: 'npm install'
