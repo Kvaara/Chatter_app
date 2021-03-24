@@ -20,36 +20,38 @@ const io = socketio(server);
 let userOnline = [];
 
 io.on("connection", (socket) => {
-  console.log("New websocket connection");
-
-  socket.on("login", (user) => {
-    console.log(user, "logged in");
-    socket.on("sendLocation", (coordinates, acknowledgement) => {
-      io.emit(
-        "message",
-        `https://www.google.com/maps?q=${coordinates.latitude},${coordinates.longitude}`
-      );
-      acknowledgement();
-    });
-
+  socket.on("login", (user, room) => {
     userOnline.push({ username: user, status: "online" });
 
-    io.emit("status", userOnline, {
-      username: user,
-      status: "online",
+    io.emit(
+      "status",
+      userOnline,
+      {
+        username: user,
+        status: "online",
+      },
+      room
+    );
+
+    socket.on("newRoom", (newRoom) => {
+      io.emit(
+        "status",
+        userOnline,
+        {
+          username: user,
+          status: "online",
+        },
+        newRoom
+      );
     });
 
     socket.on("disconnect", async () => {
-      console.log(user, "disconnected");
       socket.broadcast.emit("status", userOnline, {
         username: user,
         status: "offline",
       });
 
       userOnline = userOnline.filter((el) => el.username !== user);
-
-      console.log(userOnline, "currently online");
-
       await User.findOneAndDelete({ username: user });
     });
     socket.on("message", async (message, username, room, acknowledgement) => {
@@ -70,9 +72,9 @@ io.on("connection", (socket) => {
       "privateMessage",
       async (privateMessage, to, from, acknowledgement) => {
         const newBody = {
-          messages: [{ privateMessage, time: new Date() }],
+          messages: [{ message: privateMessage, time: new Date() }],
         };
-
+        console.log(from, "from");
         const userUpdated = await User.updateOne(
           { username: from },
           { $push: newBody }

@@ -28,7 +28,6 @@ enterForm.addEventListener("submit", async (event) => {
     } else if (res.status === 400 && username === "") {
       info.innerText = "Username can't be empty!";
     } else {
-      console.log(username.length, "length");
       info.innerText = "Entering... ";
       socket.emit("entered", username, () => {
         console.log("Acknowledgement");

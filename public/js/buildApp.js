@@ -3,11 +3,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-alert */
 const buildApp = (username, room) => {
-  socket.on("message", (message) => {
-    console.log(message);
-  });
-  console.log("logged in");
-
   document.body.textContent = "";
 
   const div = document.createElement("div");
@@ -18,12 +13,16 @@ const buildApp = (username, room) => {
 
   const hr = document.createElement("hr");
 
+  const strong = document.createElement("strong");
+  strong.innerText = "Type a message in the chat!";
+
   const p1 = document.createElement("p");
   p1.innerText =
-    "Type in a message below! P.S. You can message others privately by tagging them with @ (e.g '@username hello username')";
+    "P.S. You can message others privately by tagging them with @ (e.g '@username hello username')";
 
   div.appendChild(h1);
   div.appendChild(hr);
+  div.appendChild(strong);
   div.appendChild(p1);
 
   document.body.appendChild(div);
@@ -41,49 +40,43 @@ const buildApp = (username, room) => {
 
   usersDiv.appendChild(br);
 
-  socket.on("status", (users, user, roomName) => {
-    console.log(users, "users");
-    console.log(user, "user");
-    console.log(roomName, "room where from");
-    console.log(room, "current room");
-    if (
-      user.status === "online" &&
-      user.username !== username
-      // room !== roomName
-    ) {
-      const userOnline = document.createElement("div");
-      userOnline.className = "user";
-      userOnline.id = user.username;
-      const userOnlineSpan = document.createElement("span");
-      userOnlineSpan.innerText = user.username;
-      userOnlineSpan.className = "username";
-      userOnline.appendChild(userOnlineSpan);
-      usersDiv.appendChild(userOnline);
-    } else if (
-      user.status === "online" &&
-      user.username === username
-      // room !== roomName
-    ) {
+  document.body.appendChild(usersDiv);
+
+  socket.on("status", (users, user, newRoom = "main") => {
+    if (user.status === "online" && user.username !== username) {
+      if (
+        newRoom === "main" &&
+        document.getElementsByClassName(`${user.username}`).length !== 1
+      ) {
+        const userOnline = document.createElement("div");
+        userOnline.className = `${user.username}`;
+        userOnline.id = user.username;
+        const userOnlineSpan = document.createElement("span");
+        userOnlineSpan.innerText = `${user.username}`;
+        userOnlineSpan.className = "username";
+        userOnline.appendChild(userOnlineSpan);
+        usersDiv.appendChild(userOnline);
+      }
+    } else if (user.status === "online" && user.username === username) {
       users.forEach((User) => {
-        console.log(User);
         if (User.username !== username) {
           const userOnline = document.createElement("div");
-          userOnline.className = "user";
+          userOnline.className = `${User.username}`;
           userOnline.id = User.username;
           const userOnlineSpan = document.createElement("span");
-          userOnlineSpan.innerText = User.username;
+          userOnlineSpan.innerText = `${User.username}`;
           userOnlineSpan.className = "username";
           userOnline.appendChild(userOnlineSpan);
           usersDiv.appendChild(userOnline);
         }
       });
-    } else if (user.status === "offline") {
-      const userOffline = document.querySelector(`#${user.username}`);
-      userOffline.remove();
+    } else {
+      const userOffline = document.getElementById(`${user.username}`);
+      if (userOffline !== null) {
+        userOffline.remove();
+      }
     }
   });
-
-  document.body.appendChild(usersDiv);
 
   const chatBox = document.createElement("div");
   chatBox.className = "chatBox";
@@ -97,7 +90,6 @@ const buildApp = (username, room) => {
 
   const messages = document.createElement("ul");
   messages.className = "messages";
-  // messages.scrollTop = messages.scrollHeight;
 
   const msgField = document.createElement("input");
   msgField.type = "text";
@@ -114,11 +106,6 @@ const buildApp = (username, room) => {
   chatForm.appendChild(msgField);
   chatForm.appendChild(sendMsgBtn);
   chatBox.appendChild(chatForm);
-
-  // const sendLoc = document.createElement("button");
-  // sendLoc.innerText = "Send location";
-  // sendLoc.type = "button";
-  // sendLoc.id = "locationBtn";
 
   const buttonDiv = document.createElement("div");
   buttonDiv.className = "buttons-container";
@@ -138,13 +125,11 @@ const buildApp = (username, room) => {
   joinRoomBtn.type = "button";
   joinRoomBtn.id = "joinRoom";
 
-  // chatBox.appendChild(sendLoc);
   buttonDiv.appendChild(showMessagesBtn);
   buttonDiv.appendChild(createRoomBtn);
   buttonDiv.appendChild(joinRoomBtn);
 
   if (room !== "main") {
-    // socket.emit("login", username, room);
     const backToMain = document.createElement("button");
     backToMain.className = "backToMain";
     backToMain.type = "button";
@@ -154,30 +139,13 @@ const buildApp = (username, room) => {
 
     backToMain.addEventListener("click", () => {
       buildApp(username, "main");
+      socket.emit("newRoom", "main");
     });
   }
 
   chatBox.appendChild(buttonDiv);
 
   document.body.appendChild(chatBox);
-
-  // const locationBtn = document.querySelector("#locationBtn");
-
-  // locationBtn.addEventListener("click", () => {
-  //   const { geolocation } = navigator;
-
-  //   if (!geolocation) console.log("Geolocation services are not supported!");
-
-  //   geolocation.getCurrentPosition((position) => {
-  //     const coordinates = {
-  //       latitude: position.coords.latitude,
-  //       longitude: position.coords.longitude,
-  //     };
-  //     socket.emit("sendLocation", coordinates, () => {
-  //       console.log("Location shared");
-  //     });
-  //   });
-  // });
 
   const sendMsgForm = document.querySelector(".chat-container");
 
@@ -226,29 +194,15 @@ const buildApp = (username, room) => {
 
       if (last) last.scrollIntoView();
     }
-    // const item = document.createElement("li");
-    // if (username === user) {
-    //   item.innerHTML = `<strong>${user}</strong><strong style="color: rgb(255, 127, 0)"> (you)</strong> : ${message}`;
-    // } else {
-    //   item.innerHTML = `<strong>${user}</strong>: ${message}`;
-    // }
-    // item.className = "message";
-
-    // messages.appendChild(item);
-
-    // const allMessages = document.querySelectorAll("li");
-    // const last = allMessages[allMessages.length - 1];
-
-    // if (last) last.scrollIntoView();
   });
 
   socket.on("privateMessageReceived", (privateMessage, to, from) => {
     if (username === from || username === to) {
       const item = document.createElement("li");
       if (username === from) {
-        item.innerHTML = `<strong style="color: rgb(255, 127, 0)">(you)</strong><strong style="color: red"> => @${to}</strong>: ${privateMessage}`;
+        item.innerHTML = `<strong style="color: rgb(255, 127, 0)">(you)</strong><strong style="color: red"> => @${to}</strong> : ${privateMessage}`;
       } else {
-        item.innerHTML = `<strong style="color: red">${from} => @</strong><strong style="color: rgb(255, 127, 0)">(you)</strong>: ${privateMessage}`;
+        item.innerHTML = `<strong style="color: red">${from} => @</strong><strong style="color: rgb(255, 127, 0)">(you)</strong> : ${privateMessage}`;
       }
       item.className = "message";
 
@@ -333,8 +287,6 @@ const buildApp = (username, room) => {
         "There are no rooms available.\nCreate one by clicking the 'Create a room' button."
       );
     } else {
-      console.log(rooms);
-
       let roomArray = "";
 
       rooms.forEach((room) => {
@@ -347,7 +299,7 @@ const buildApp = (username, room) => {
 
       if (roomArray.includes(roomName)) {
         buildApp(username, roomName);
-        // socket.emit("login", username);
+        socket.emit("newRoom", roomName);
       } else {
         alert(`The room '${roomName}' does not exist!`);
       }
